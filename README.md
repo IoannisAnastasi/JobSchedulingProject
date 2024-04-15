@@ -5,7 +5,7 @@ Basic idea: there are 2 separate programs (so 2 different main methods). OrderGe
 OrderDelivery calculates the order completion time based on set parameters and 3 different time scheduling algorithms and it outputs the results in a different text file. A report can then be created.
 
 
-The classes I(Christoforos Kontzias: 1134670) will implement are:
+The classes I ,(Christoforos Kontzias: 1134670) will implement are:
 OrderDelivery (handles the delivery process)
 Scheduler (defines scheduling basic behaviour)
 FCFSScheduler (handles FCFS scheduling  algorithm for use in this program)
