@@ -17,5 +17,5 @@ public interface Scheduler {
      * @param grill the grill to be used for processing orders that require grilling.
      * @param fryers the list of fryers available for frying operations.
      */
-    void schedule(List<Order> orders, Grill grill, List<Fryer> fryers);
+    public void schedule(List<Order> orders, Grill grill, Fryer fryers);
 }

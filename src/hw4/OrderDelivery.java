@@ -1,104 +1,66 @@
-/**
- * @author Christoforos Kontzias 1134670 (team 40)
- */
 package hw4;
-import java.util.List;
-import java.util.ArrayList;
-
 /**
- * the OrderDelivery system manages the processing of food orders using different scheduling algorithms.
- * it handles the operation based on the configuration of grills and fryers using specified dimensions
- * and capacities for cooking products
+ * @author Christoforos Kontzias 1134670
  */
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
 public class OrderDelivery {
-    private Scheduler scheduler;
-    private Grill grill;
-    private List<Fryer> fryers;
-
-    /**
-     * constructs an OrderDelivery system with specified scheduler, grill, and fryers.
-     * 
-     * @param scheduler The scheduling strategy to be used for order processing.
-     * @param grill The grill to be used including its preparation specifications.
-     * @param fryers The list of fryers available for use.
-     */
-    public OrderDelivery(Scheduler scheduler, Grill grill, List<Fryer> fryers) {
-        this.scheduler = scheduler;
-        this.grill = grill;
-        this.fryers = fryers;
-    }
-
-    /**
-     * processes a list of orders using the initialized scheduler and resources.
-     * 
-     * @param orders The list of orders to be processed.
-     */
-    public void processOrders(List<Order> orders) {
-        scheduler.schedule(orders, grill, fryers);
-    }
-
-    /**
-     * the main method to set up and start the OrderDelivery system.
-     * 
-     * @param args command line arguments providing the grill fryer specifications and scheduler choice.
-     */
     public static void main(String[] args) {
-        if (args.length != 8) {
-            System.out.println("Usage: java OrderDelivery <grillLength> <grillPrepTime> <numFryers> <fryerCapacity> " +
-                "<skewerLengthSouvlaki> <skewerLengthSeftalia> <pittaSize> <algorithmChoice>");
-            return;
+        if (args.length != 9) {
+            System.err.println("Usage: java OrderDelivery <grill length> <charcoal time> <number of fryers> <capacity per fryer> <skewer x space> <skewer y space> <pita z space> <algorithm number>");
+            System.exit(1);
         }
 
-        try {
-            int grillLength = Integer.parseInt(args[0]);
-            int grillPrepTime = Integer.parseInt(args[1]);
-            int numFryers = Integer.parseInt(args[2]);
-            int fryerCapacity = Integer.parseInt(args[3]);
-            int skewerLengthSouvlaki = Integer.parseInt(args[4]);
-            int skewerLengthSeftalia = Integer.parseInt(args[5]);
-            int pittaSize = Integer.parseInt(args[6]);
-            int algorithmChoice = Integer.parseInt(args[7]);
+        int grillLength = Integer.parseInt(args[0]);
+        int charcoalTime = Integer.parseInt(args[1]);
+        int numberOfFryers = Integer.parseInt(args[2]);
+        int capacityPerFryer = Integer.parseInt(args[3]);
+        int skewerXSpace = Integer.parseInt(args[4]);
+        int skewerYSpace = Integer.parseInt(args[5]);
+        int pitaZSpace = Integer.parseInt(args[6]);
+        int algorithmNumber = Integer.parseInt(args[7]);
 
-            Scheduler scheduler = chooseScheduler(algorithmChoice);
-            Grill grill = new Grill(grillLength, grillPrepTime);
-            List<Fryer> fryers = new ArrayList<>();
-            for (int i = 0; i < numFryers; i++) {
-                fryers.add(new Fryer(fryerCapacity));
+        Grill grill = new Grill(grillLength);
+        Fryer fryer = new Fryer(numberOfFryers * capacityPerFryer);
+        Scheduler scheduler;
+
+        switch (algorithmNumber) {
+            case 1:
+                scheduler = new FCFSScheduler();
+                break;
+            case 2:
+                scheduler = new SJFScheduler();
+                break;
+            case 3:
+                scheduler = new WeightedScheduler();
+                break;
+            default:
+                System.err.println("Invalid scheduling algorithm number");
+                return;
+        }
+
+        List<Order> orders = new ArrayList<>();
+        try (Scanner scanner = new Scanner(new File("Orders.txt"))) {
+            scanner.nextInt(); // Skip the number of orders at the top
+            while (scanner.hasNextInt()) {
+                int num = scanner.nextInt();
+                int tOrder = scanner.nextInt();
+                int tDelReq = scanner.nextInt();
+                int npp = scanner.nextInt();
+                int npc = scanner.nextInt();
+                int nps = scanner.nextInt();
+                int npm = scanner.nextInt();
+                int fries = scanner.nextInt();
+                orders.add(new Order(num, tOrder, tDelReq, npp, npc, nps, npm, fries));
             }
-
-            List<Order> orders = loadOrders();  // GIANNIS
-
-            OrderDelivery delivery = new OrderDelivery(scheduler, grill, fryers);
-            delivery.processOrders(orders);
-
-            System.out.println("Simulation complete. Results processed.");
-        } catch (NumberFormatException e) {
-            System.out.println("Error: Invalid number format in arguments.");
+        } catch (FileNotFoundException e) {
+            System.err.println("File not found: " + e.getMessage());
         }
-    }
 
-    /**
-     * selects the appropriate scheduler based on the command line
-     * 
-     * @param algorithmChoice The integer representing the scheduler choice.
-     * @return The scheduler instance according to the choice.
-     */
-    private static Scheduler chooseScheduler(int algorithmChoice) {
-        switch (algorithmChoice) {
-            case 1: return new FCFSScheduler();
-            case 2: return new SJFScheduler();
-            case 3: return new WeightedScheduler();
-            default: throw new IllegalArgumentException("Invalid algorithm choice. Must be 1, 2, or 3.");
-        }
-    }
-
-    /**
-     *  ANAGAIA METHOD STIN KLASI TOU GIANNI POU EXEI TO FILE HANDLING.
-     * 
-     * @return A list of orders pou prepei na kameis sosta format.
-     */
-    private static List<Order> loadOrders() {
-
-        return new ArrayList<>();
+        scheduler.schedule(orders, grill, fryer);
     }
 }
