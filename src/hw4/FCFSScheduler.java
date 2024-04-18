@@ -26,7 +26,7 @@ public class FCFSScheduler implements Scheduler {
             //check and wait until there is enough space for both the grill and fryer items of the order
             while (!grill.canAddToGrill(order) || !fryer.canAddFries(order)) {
                 grill.processGrill(currentTime);
-                fryer.update(currentTime);
+                fryer.update(currentTime);                              
                 currentTime++;//increment time as we wait for space
             }
 

@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.io.FileWriter;
+
 
 public class OrderDelivery {
     public static void main(String[] args) {
@@ -24,7 +26,7 @@ public class OrderDelivery {
         int pitaZSpace = Integer.parseInt(args[6]);
         int algorithmNumber = Integer.parseInt(args[7]);
 
-        Grill grill = new Grill(grillLength);
+        Grill grill = new Grill(grillLength, skewerXSpace, skewerYSpace, pitaZSpace,charcoalTime);
         Fryer fryer = new Fryer(numberOfFryers * capacityPerFryer);
         Scheduler scheduler;
 
@@ -45,7 +47,7 @@ public class OrderDelivery {
 
         List<Order> orders = new ArrayList<>();
         try (Scanner scanner = new Scanner(new File("Orders.txt"))) {
-            scanner.nextInt(); // Skip the number of orders at the top
+            scanner.nextInt();//skip the number of orders at the top
             while (scanner.hasNextInt()) {
                 int num = scanner.nextInt();
                 int tOrder = scanner.nextInt();
@@ -63,4 +65,40 @@ public class OrderDelivery {
 
         scheduler.schedule(orders, grill, fryer);
     }
+
+
+
+    private static void writeResults(List<Order> orders, String filename) {
+        try (FileWriter writer = new FileWriter(filename)) {
+            int totalDeviation = 0;
+            int satisfiedCount = 0;
+
+            // Calculate total deviation and count satisfied customers
+            for (Order order : orders) {
+                int deviation = order.getEndTime() - order.getTdelReq();
+                totalDeviation += Math.abs(deviation);
+                if (order.getEndTime() <= order.getTdelReq()) {
+                    satisfiedCount++; // Count as satisfied if delivered on or before requested time
+                }
+            }
+
+            // Calculate average deviation if there are orders
+            double averageDeviation = orders.size() > 0 ? (double) totalDeviation / orders.size() : 0;
+
+            // Write summary information
+            writer.write(String.format("%d %.2f %d\n", orders.size(), averageDeviation, satisfiedCount));
+
+            // Write detailed order information
+            for (Order order : orders) {
+                int totalPitas = order.getNpp() + order.getNpc() + order.getNps() + order.getNpm(); // Sum of all types of pitas
+                int deviation = order.getEndTime() - order.getTdelReq();
+                writer.write(String.format("%d %d %d %d %d %d\n",
+                              order.getNum(), order.getTorder(), order.getEndTime(), 
+                              deviation, totalPitas, order.getFries()));
+            }
+        } catch (IOException e) {
+            System.err.println("Unable to write to file: " + e.getMessage());
+        }
+    }
+
 }

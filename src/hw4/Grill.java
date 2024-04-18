@@ -8,17 +8,18 @@ import java.util.List;
 
 /**
  * represents the grilling area for preparing various types of skewers and pitas.
- * it manages the capacity of the grill and the placement of items on it.
+ * it manages the capacity of the grill and the placement of items on it, including the time for the charcoal to burn.
  */
 public class Grill {
-    private final int capacity; //total capacity of the grill in centimeters
+    private final int capacity;//total capacity of the grill in centimeters
     private int usedCapacity = 0;
     private List<GrillItem> grillItems = new ArrayList<>();
 
- 
-    private final int skewerXSpace; //space for pork skewer
-    private final int skewerYSpace; //space for chicken skewer
-    private final int pitaZSpace;   //space for pita
+    private final int charcoalTime;//time for the charcoal to burn
+    private final int skewerXSpace;//space for pork skewer
+    private final int skewerYSpace;//space for chicken skewer
+    private final int pitaZSpace;//space for pita
+    private int operationalTime;//the time when the grill will be ready to use
 
     /**
      * constructs a Grill object with specified dimensions and capacity.
@@ -27,22 +28,36 @@ public class Grill {
      * @param skewerXSpace The space occupied by each pork skewer.
      * @param skewerYSpace The space occupied by each chicken skewer.
      * @param pitaZSpace The space occupied by each pita.
+     * @param charcoalTime The time needed for the charcoal to be ready, starting from 17:30.
      */
-    public Grill(int capacity, int skewerXSpace, int skewerYSpace, int pitaZSpace) {
+    public Grill(int capacity, int skewerXSpace, int skewerYSpace, int pitaZSpace, int charcoalTime) {
         this.capacity = capacity;
         this.skewerXSpace = skewerXSpace;
         this.skewerYSpace = skewerYSpace;
         this.pitaZSpace = pitaZSpace;
+        this.charcoalTime = charcoalTime;
+        this.operationalTime = calculateOperationalTime();
     }
 
     /**
-     * attempts to add an order to the grill based on available capacity.
+     * calculates the operational time of the grill based on the charcoal time and order acceptance start time.
+     * charcoal starts at 17:30, if preparation time exceeds 30 minutes, it affects the operational time.
      *
-     * @param order The order to add to the grill.
-     * @param currentTime The current simulation time in minutes.
-     * @return true if the order fits and is added, false otherwise.
+     * @return The operational time in minutes after 17:30.
      */
+    private int calculateOperationalTime() {
+        int baseTime = 30; //30 minutes from 17:30 to 18:00 when orders start being accepted
+        if (charcoalTime > 30) {
+            return baseTime + (charcoalTime - 30); //only the extra time beyond 30 minutes adds to the base time
+        }
+        return baseTime; //grill is operationally ready by 18:00 if charcoal time is <= 30 minutes
+    }
+
     public boolean addToGrill(Order order, int currentTime) {
+        if (currentTime < operationalTime) {
+            return false; //grill is not ready yet
+        }
+
         int spaceNeeded = calculateSpaceForOrder(order);
         if (spaceNeeded + usedCapacity <= capacity) {
             GrillItem item = new GrillItem(order, currentTime, spaceNeeded);
@@ -53,12 +68,6 @@ public class Grill {
         return false;
     }
 
-    /**
-     * calculates the space needed for the given order based on its contents.
-     *
-     * @param order The order to calculate space for.
-     * @return The total space needed on the grill for the order.
-     */
     private int calculateSpaceForOrder(Order order) {
         int space = order.getNpp() * skewerXSpace +
                     order.getNpc() * skewerYSpace +
@@ -67,22 +76,22 @@ public class Grill {
         return space;
     }
 
-    /**
-     * processes the grill by updating its state and removing any items that have finished cooking.
-     *
-     * @param currentTime The current simulation time in minutes used to check if items are done.
-     */
     public void processGrill(int currentTime) {
         grillItems.removeIf(item -> item.isDone(currentTime));
         usedCapacity = grillItems.stream().mapToInt(GrillItem::getSpaceUsed).sum();
     }
+
     public boolean canAddToGrill(Order order) {
         int requiredSpace = calculateSpaceForOrder(order);
         return (usedCapacity + requiredSpace) <= capacity;
     }
-    /**
-     * inner class to handle grill items. Each item corresponds to an order and tracks its own cooking time and space usage.
-     */
+
+    public boolean isEmpty() {
+        return grillItems.isEmpty();
+    }
+/**
+ * Inner class which handles GrillItem. I decided to use an inner class because Grill items are solely need in the grill
+ */
     private class GrillItem {
         Order order;
         int startTime;
@@ -94,52 +103,28 @@ public class Grill {
             this.spaceUsed = spaceUsed;
         }
 
-        /**
-         * checks if the item is done cooking based on the current time.
-         *
-         * @param currentTime The current time in minutes.
-         * @return true if the item is done cooking, false otherwise.
-         */
         boolean isDone(int currentTime) {
             int cookTime = getMaxCookTime(order);
             return currentTime >= (startTime + cookTime);
         }
 
-        /**
-         * calculates the maximum cooking time required for the items in the order.
-         *
-         * @param order The order containing the items.
-         * @return The maximum cooking time in minutes.
-         */
         private int getMaxCookTime(Order order) {
             int maxTime = 0;
             if (order.getNpp() > 0) {
-                maxTime = Math.max(maxTime, 25); // 20-25 minutes for pork
+                maxTime = Math.max(maxTime, 25);//20-25 minutes for pork
             }
             if (order.getNpc() > 0) {
-                maxTime = Math.max(maxTime, 20); // 15-20 minutes for chicken
+                maxTime = Math.max(maxTime, 20);//15-20 minutes for chicken
             }
             if (order.getNps() > 0 || order.getNpm() > 0) {
-                maxTime = Math.max(maxTime, 25); // 25 minutes for pita (both seftalia and mix)
+                maxTime = Math.max(maxTime, 25);//25 minutes for pitta(both sheftalia and mix)
             }
             return maxTime;
         }
 
-        /**
-         * gets the space used by this grill item on the grill.
-         *
-         * @return The space used in centimeters.
-         */
         public int getSpaceUsed() {
             return spaceUsed;
         }
-    }
-    /**
-     * checks if the grill is currently empty (no items being cooked).
-     * @return true if there are no items on the grill, false otherwise.
-     */
-    public boolean isEmpty() {
-        return grillItems.isEmpty();
     }
 }
 

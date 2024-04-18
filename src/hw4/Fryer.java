@@ -66,9 +66,7 @@ public class Fryer {
      * calculates the current number of fries portions in the fryer.
      * @return the number of currently frying fries portions.
      */
-    private int getCurrentFriesCount() {
-        return fryerItems.size();
-    }
+  
  public boolean canAddFries(Order order) {
             int friesNeeded = order.getFries();
             return (usedCapacity + friesNeeded) <= capacity;

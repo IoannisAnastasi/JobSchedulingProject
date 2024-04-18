@@ -6,20 +6,20 @@ package hw4;
 import java.util.List;
 
 /**
- * Scheduler implementation that processes orders based on a calculated weight,
+ * scheduler implementation that processes orders based on a calculated weight,
  * prioritizing orders that can be immediately executed given current resource availability.
  */
 public class WeightedScheduler implements Scheduler {
 
     /**
-     * Schedules and processes orders using a weighted approach, focusing on urgency and execution capability.
+     * schedules and processes orders using a weighted approach, focusing on urgency and execution capability.
      * @param orders the list of orders to process.
      * @param grill the grill to cook skewers and pitas.
      * @param fryer the fryer to cook fries.
      */
     @Override
     public void schedule(List<Order> orders, Grill grill, Fryer fryer) {
-        int currentTime = 0; // Simulation start time, typically the opening time of the shop.
+        int currentTime = 0; //simulation start time
 
         while (!orders.isEmpty()) {
             boolean orderProcessed = false;
@@ -83,10 +83,10 @@ public class WeightedScheduler implements Scheduler {
      */
     private int estimateExecutionTime(Order order) {
         int time = 0;
-        time += order.getNpp() * 25; // assume 25 minutes for pork skewers
-        time += order.getNpc() * 20; // 20 minutes for chicken skewers
-        time += order.getNps() * 25; // 25 minutes for another type
-        time += order.getFries() * 20; // 20 minutes per portion of fries
+        time += order.getNpp() * 25; //assume 25 minutes for pork smila
+        time += order.getNpc() * 20; //20 minutes for chicken smila
+        time += order.getNps() * 25; //25 minutes for another type
+        time += order.getFries() * 20;//20 minutes per portion of fries
         return time;
     }
 }
