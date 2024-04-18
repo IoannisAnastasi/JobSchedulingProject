@@ -17,6 +17,18 @@ public class Order {
 		count++;
 	}
 	
+	public Order(int num, int tOrder, int tDelReq, int npp, int npc, int nps, int npm, int fries)
+	{
+		this.num=num;
+		this.tOrder=tOrder;
+		this.tDelReq=tDelReq;
+		this.npp=npp;
+		this.npc=npc;
+		this.nps=nps;
+		this.npm=npm;
+		this.fries=fries;
+	}
+	
 	public void setTorder(int tOrder)
 	{
 		this.tOrder=tOrder;

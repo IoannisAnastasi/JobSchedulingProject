@@ -18,7 +18,7 @@ public class OrderGenerator {
 			  
             // attach a file to FileWriter 
             FileWriter fw  = new FileWriter("Orders.txt");
-            fw.write(args[0]+"/n");
+            fw.write(args[0]+"\n");
             for(int i=0; i<Integer.parseInt(args[0]); i++)
             {
         		Generator order=new Generator();
@@ -26,8 +26,8 @@ public class OrderGenerator {
         		order.generateFries();
         		order.generateTimeOfOrder();
         		order.generateRequestedTime();
-        		orders.set(i,(Order) order);
-                fw.write(orders.get(i)+"/n");
+        		orders.add(i, order);
+                fw.write(orders.get(i)+"\n");
 
 
             }
