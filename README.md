@@ -1,4 +1,4 @@
-HOMEWORK 4 - TAKE-AWAY 
+HOMEWORK 4: TAKE-AWAY 
 TEAM 40 : Ioannis Anastasi ID: 1131712 - Christoforos Kontzias ID: 1134670  
 
 Basic idea: there are 2 separate programs (so 2 different main methods). OrderGenerator creates the random orders and places them in the text file. 
