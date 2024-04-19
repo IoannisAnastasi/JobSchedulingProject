@@ -8,11 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.io.FileWriter;
+import java.io.IOException;
 
-
+/**
+ * Handles the choice of algorithm and file handling
+ */
 public class OrderDelivery {
     public static void main(String[] args) {
-        if (args.length != 9) {
+        if (args.length != 8) {
             System.err.println("Usage: java OrderDelivery <grill length> <charcoal time> <number of fryers> <capacity per fryer> <skewer x space> <skewer y space> <pita z space> <algorithm number>");
             System.exit(1);
         }
@@ -68,37 +71,42 @@ public class OrderDelivery {
 
 
 
-    private static void writeResults(List<Order> orders, String filename) {
+    public static void writeResults(List<Order> orders, int[] endTimes, String filename) {
         try (FileWriter writer = new FileWriter(filename)) {
             int totalDeviation = 0;
             int satisfiedCount = 0;
 
-            // Calculate total deviation and count satisfied customers
-            for (Order order : orders) {
-                int deviation = order.getEndTime() - order.getTdelReq();
+          
+            for (int i = 0; i < orders.size(); i++) {
+                Order order = orders.get(i);
+                int endTime = endTimes[i];
+                int deviation = endTime - order.getTdelReq();
                 totalDeviation += Math.abs(deviation);
-                if (order.getEndTime() <= order.getTdelReq()) {
-                    satisfiedCount++; // Count as satisfied if delivered on or before requested time
+                if (endTime <= order.getTdelReq()) {
+                    satisfiedCount++; 
                 }
             }
 
-            // Calculate average deviation if there are orders
+           
             double averageDeviation = orders.size() > 0 ? (double) totalDeviation / orders.size() : 0;
 
-            // Write summary information
+           
             writer.write(String.format("%d %.2f %d\n", orders.size(), averageDeviation, satisfiedCount));
 
-            // Write detailed order information
-            for (Order order : orders) {
-                int totalPitas = order.getNpp() + order.getNpc() + order.getNps() + order.getNpm(); // Sum of all types of pitas
-                int deviation = order.getEndTime() - order.getTdelReq();
+  
+            for (int i = 0; i < orders.size(); i++) {
+                Order order = orders.get(i);
+                int endTime = endTimes[i];
+                int deviation = endTime - order.getTdelReq();
+                int totalPitas = order.getNpp() + order.getNpc() + order.getNps() + order.getNpm();
                 writer.write(String.format("%d %d %d %d %d %d\n",
-                              order.getNum(), order.getTorder(), order.getEndTime(), 
+                              order.getNum(), order.getTorder(), endTime,
                               deviation, totalPitas, order.getFries()));
             }
         } catch (IOException e) {
             System.err.println("Unable to write to file: " + e.getMessage());
         }
     }
+
 
 }

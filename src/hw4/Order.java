@@ -17,7 +17,7 @@ public class Order {
 	private int nps;		//number of sheftalia pittas in the order
 	private int npm;		//number of mixed pitta in the order 
 	private int fries;		//number of portions of fries in the order
-	
+
 	/**
      * Default constructor for Order class.
      * Initializes the order with a serial number and increments the count.
@@ -152,7 +152,10 @@ public class Order {
     public int getNpp() {
         return npp;
     }
-
+    public int getTotalPitas() {
+        return npp + npc + nps + npm;
+    }
+    
     /**
      * Returns the number of pitta chicken skewers in the order.
      * 
