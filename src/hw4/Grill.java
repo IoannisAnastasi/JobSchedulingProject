@@ -52,7 +52,9 @@ public class Grill {
         }
         return baseTime; //grill is operationally ready by 18:00 if charcoal time is <= 30 minutes
     }
-
+    public int getOperationalTime() {
+    	return this.operationalTime;
+    }
     public boolean addToGrill(Order order, int currentTime) {
         if (currentTime < operationalTime) {
             return false; //grill is not ready yet
@@ -92,6 +94,50 @@ public class Grill {
 /**
  * Inner class which handles GrillItem. I decided to use an inner class because Grill items are solely need in the grill
  */
+    /**
+     * calculates the maximum cooking time required for the items in the order
+     * @param order The order containing the items.
+     * @return the maximum cooking time in minutes.
+     */
+    public int getMaxCookTime(Order order) {
+        int maxTime = 0;
+
+        //pork skewer cooking time
+        if (order.getNpp() > 0) {
+            int porkTime = 20 + (int)(Math.random() * (25 - 20 + 1)); //random time between 20 and 25 minutes
+            maxTime = Math.max(maxTime, porkTime);
+        }
+
+        //chicken skewer cooking time
+        if (order.getNpc() > 0) {
+            int chickenTime = 15 + (int)(Math.random() * (20 - 15 + 1)); //random time between 15 and 20 minutes
+            maxTime = Math.max(maxTime, chickenTime);
+        }
+
+        //sheftalia cooking time
+        if (order.getNps() > 0) {
+            int seftaliaTime = 25; //constant 25 minutes, as seftalia has no range
+            maxTime = Math.max(maxTime, seftaliaTime);
+        }
+
+        //mix pitta cooking time considering the longest of the included items
+        if (order.getNpm() > 0) {
+            int mixTime = Math.max(
+                20 + (int)(Math.random() * (25 - 20 + 1)), // Random pork time
+                25  //constant seftalia time
+            );
+            maxTime = Math.max(maxTime, mixTime);
+        }
+
+        //pitta bread cooking time
+        if (order.getNpp() > 0 || order.getNpc() > 0 || order.getNps() > 0 || order.getNpm() > 0) {
+            int pitaTime = 5; // Constant time for pita bread
+            maxTime = Math.max(maxTime, pitaTime);
+        }
+
+        return maxTime;
+    }
+
     private class GrillItem {
         Order order;
         int startTime;
@@ -108,17 +154,47 @@ public class Grill {
             return currentTime >= (startTime + cookTime);
         }
 
-        private int getMaxCookTime(Order order) {
+        /**
+         * calculates the maximum cooking time required for the items in the order
+         * @param order The order containing the items.
+         * @return the maximum cooking time in minutes.
+         */
+        public int getMaxCookTime(Order order) {
             int maxTime = 0;
+
+            //pork skewer cooking time
             if (order.getNpp() > 0) {
-                maxTime = Math.max(maxTime, 25);//20-25 minutes for pork
+                int porkTime = 20 + (int)(Math.random() * (25 - 20 + 1)); // Random time between 20 and 25 minutes
+                maxTime = Math.max(maxTime, porkTime);
             }
+
+            //chicken skewer cooking time
             if (order.getNpc() > 0) {
-                maxTime = Math.max(maxTime, 20);//15-20 minutes for chicken
+                int chickenTime = 15 + (int)(Math.random() * (20 - 15 + 1)); // Random time between 15 and 20 minutes
+                maxTime = Math.max(maxTime, chickenTime);
             }
-            if (order.getNps() > 0 || order.getNpm() > 0) {
-                maxTime = Math.max(maxTime, 25);//25 minutes for pitta(both sheftalia and mix)
+
+            //sheftalia cooking time
+            if (order.getNps() > 0) {
+                int seftaliaTime = 25; // Constant 25 minutes, as seftalia has no range
+                maxTime = Math.max(maxTime, seftaliaTime);
             }
+
+            //mix pitta cooking time considering the longest of the included items
+            if (order.getNpm() > 0) {
+                int mixTime = Math.max(
+                    20 + (int)(Math.random() * (25 - 20 + 1)), // Random pork time
+                    25  // Constant seftalia time
+                );
+                maxTime = Math.max(maxTime, mixTime);
+            }
+
+            //pitta bread cooking time
+            if (order.getNpp() > 0 || order.getNpc() > 0 || order.getNps() > 0 || order.getNpm() > 0) {
+                int pitaTime = 5; // Constant time for pita bread
+                maxTime = Math.max(maxTime, pitaTime);
+            }
+
             return maxTime;
         }
 
@@ -127,4 +203,3 @@ public class Grill {
         }
     }
 }
-
